@@ -9,49 +9,23 @@ import java.lang.StringBuilder;
 import java.nio.charset.StandardCharsets;
 
 public class WsppPosition {
-    public static boolean check(int got) {
-        char curChar = (char) got;
-        return Character.isLetter(curChar) || Character.getType(curChar) == Character.DASH_PUNCTUATION || curChar == '\'';
-    }
-
     public static void main(String[] args) {
         try {
             Scanner in = new Scanner(args[0], StandardCharsets.UTF_8);
 
             try {
-                Scanner curLine;
-                int curChar, pos, row = 0;
                 Map<String, Integer> cnt = new LinkedHashMap<>();
                 IntList appear = new IntList();
 
-                while (in.hasNextLine()) {
-                    curLine = new Scanner(in.nextLine());
-                    row++;
-                    curChar = curLine.read();
-                    pos = 1;
+                while (in.hasNextWord()) {
+                    String word = in.nextWord();
 
-                    while (curChar != -1) {
-                        if (check(curChar)) {
-                            StringBuilder word = new StringBuilder();
-                            while (check(curChar)) {
-                                word.append(Character.toLowerCase((char) curChar));
-                                curChar = curLine.read();
-                            }
-
-                            String finWord = word.toString();
-
-                            if (cnt.containsKey(finWord)) {
-                                appear.addPos(cnt.get(finWord), pos);
-                                appear.addPos(cnt.get(finWord), row);
-                            } else {
-                                cnt.put(finWord, cnt.size());
-                                appear.add(pos, row);
-                            }
-
-                            pos += 1;
-                        }
-
-                        curChar = curLine.read();
+                    if (cnt.containsKey(word)) {
+                        appear.addPos(cnt.get(word), in.getPos());
+                        appear.addPos(cnt.get(word), in.getRow());
+                    } else {
+                        cnt.put(word, cnt.size());
+                        appear.add(in.getPos(), in.getRow());
                     }
                 }
 
